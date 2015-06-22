@@ -20,6 +20,7 @@ import com.squareup.okhttp.Response;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -27,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
 	ArrayAdapter<String> adapter;
 	ArrayList<String> data;
 	OkHttpClient client;
-	String SERVER="http://xxx.xxxx.xxx/";
+	final String SERVER = "http://xxx.xxxx.xxx/";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -50,50 +51,15 @@ public class MainActivity extends AppCompatActivity {
 			public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 				switch (i) {
 					case 0:
-						Request req = new Request.Builder().url(SERVER).build();
-						Call call = client.newCall(req);
-						call.enqueue(new Callback() {
-							@Override
-							public void onFailure(Request request, IOException e) {
-								Log.e("Error", e.toString());
-							}
-
-							@Override
-							public void onResponse(Response response) throws IOException {
-								if (response.isSuccessful()) {
-									Log.d("Response", response.body().string());
-								}
-							}
-						});
+						getReq("test");
 						break;
 					case 1:
-						RequestBody formBody = new FormEncodingBuilder()
-								.add("key1", "value1")
-								.add("key2", "value2")
-								.add("key3", "value3")
-								.add("key4", "value4")
-								.add("key5", "value5")
-								.build();
-						Request request = new Request.Builder()
-								.url(SERVER)
-								.post(formBody)
-								.build();
 
-						Call call1 = client.newCall(request);
-						call1.enqueue(new Callback() {
-							@Override
-							public void onFailure(Request request, IOException e) {
-								Log.e("Error",e.toString());
-							}
-
-							@Override
-							public void onResponse(Response response) throws IOException {
-								if (response.isSuccessful()) {
-									Log.d("Response",response.body().string());
-								}
-							}
-						});
-
+						HashMap<String, String> params = new HashMap<String, String>();
+						params.put("Key1", "Value1");
+						params.put("Key2", "Value2");
+						params.put("Key3", "Value3");
+						postReq("test", params);
 						break;
 					case 2:
 
@@ -102,6 +68,56 @@ public class MainActivity extends AppCompatActivity {
 			}
 		});
 	}
+
+	void postReq(String urlHandle, HashMap<String, String> params) {
+		FormEncodingBuilder formdata = new FormEncodingBuilder();
+		for (String param : params.keySet()) {
+			formdata.add(param, params.get(param));
+		}
+		RequestBody formBody = formdata.build();
+
+		Request request = new Request.Builder()
+				.url(SERVER + urlHandle)
+				.post(formBody)
+				.build();
+
+		Call call1 = client.newCall(request);
+		call1.enqueue(new Callback() {
+			@Override
+			public void onFailure(Request request, IOException e) {
+				Log.e("Error", e.toString());
+			}
+
+			@Override
+			public void onResponse(Response response) throws IOException {
+				if (response.isSuccessful()) {
+					Log.d("Response", response.body().string());
+				}
+			}
+		});
+
+	}
+
+	void getReq(String urlHandle) {
+
+		Request req = new Request.Builder().url(SERVER + urlHandle).build();
+		Call call = client.newCall(req);
+		call.enqueue(new Callback() {
+			@Override
+			public void onFailure(Request request, IOException e) {
+				Log.e("Error", e.toString());
+			}
+
+			@Override
+			public void onResponse(Response response) throws IOException {
+				if (response.isSuccessful()) {
+					Log.d("Response", response.body().string());
+				}
+			}
+		});
+
+	}
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
