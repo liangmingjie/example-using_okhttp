@@ -1,16 +1,12 @@
 package in.excogitation.example_using_okhttp;
 
-import android.util.Log;
-
 import com.squareup.okhttp.Call;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.FormEncodingBuilder;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
-import com.squareup.okhttp.Response;
 
-import java.io.IOException;
 import java.util.HashMap;
 
 /**
@@ -27,7 +23,7 @@ public class NetworkWrapper {
 		client = new OkHttpClient();
 	}
 
-	public void postReq(String urlHandle, HashMap<String, String> params) {
+	public void postReq(String urlHandle, HashMap<String, String> params,Callback callback) {
 		FormEncodingBuilder formdata = new FormEncodingBuilder();
 		for (String param : params.keySet()) {
 			formdata.add(param, params.get(param));
@@ -40,39 +36,15 @@ public class NetworkWrapper {
 				.build();
 
 		Call call1 = client.newCall(request);
-		call1.enqueue(new Callback() {
-			@Override
-			public void onFailure(Request request, IOException e) {
-				Log.e("Error", e.toString());
-			}
-
-			@Override
-			public void onResponse(Response response) throws IOException {
-				if (response.isSuccessful()) {
-					Log.d("Response", String.valueOf(response.code()) + " | "+response.body().string());
-				}
-			}
-		});
+		call1.enqueue(callback);
 
 	}
 
-	public void getReq(String urlHandle) {
+	public void getReq(String urlHandle,Callback callback) {
 
 		Request req = new Request.Builder().url(SERVER + urlHandle).build();
 		Call call = client.newCall(req);
-		call.enqueue(new Callback() {
-			@Override
-			public void onFailure(Request request, IOException e) {
-				Log.e("Error", e.toString());
-			}
-
-			@Override
-			public void onResponse(Response response) throws IOException {
-				if (response.isSuccessful()) {
-					Log.d("Response", String.valueOf(response.code()));
-				}
-			}
-		});
+		call.enqueue(callback);
 
 	}
 

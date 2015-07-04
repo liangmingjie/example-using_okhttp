@@ -2,11 +2,17 @@ package in.excogitation.example_using_okhttp;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.squareup.okhttp.Callback;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -41,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
 				switch (i) {
 					case 0:
 						//Make GET Req
-						client.getReq("test");
+						client.getReq("test",httpCallback);
 						break;
 					case 1:
 						//Setup params
@@ -50,10 +56,24 @@ public class MainActivity extends AppCompatActivity {
 						params.put("Key2", "Value2");
 						params.put("Key3", "Value3");
 						//Make POST Req
-						client.postReq("test", params);
+						client.postReq("test", params,httpCallback);
 						break;
 				}
 			}
 		});
 	}
+
+	Callback httpCallback=new Callback() {
+		@Override
+		public void onFailure(Request request, IOException e) {
+			Log.e("Error", e.toString());
+		}
+
+		@Override
+		public void onResponse(Response response) throws IOException {
+			if (response.isSuccessful()) {
+				Log.d("Response", String.valueOf(response.code()) + " | "+response.body().string());
+			}
+		}
+	};
 }
